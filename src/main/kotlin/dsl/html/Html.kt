@@ -5,7 +5,7 @@ annotation class HtmlMarker
 
 @HtmlMarker
 abstract class Tag(val name: String) {
-    val children: List<Tag> = mutableListOf()
+    val children: MutableList<Tag> = mutableListOf()
     fun render(): String = "<$name>${renderInner()}</$name>"
     protected fun <T : Tag> initTag(tag: T, init: T.() -> Unit): T = tag.apply { init() }.also { children.add(it) }
     protected open fun renderInner(): String = children.joinToString("") { it.render() }
