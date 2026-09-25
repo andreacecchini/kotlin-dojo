@@ -7,9 +7,12 @@ interface Tag {
     fun render(): String = "<$name>${renderInner()}</$name>"
 }
 
-interface TagWithContent : Tag {
-    var content: String?
+abstract class TagWithContent : Tag {
+    var content: String? = null
     override fun renderInner(): String = (content ?: "") + super.renderInner()
+    operator fun String.unaryMinus() {
+        content = this
+    }
 }
 
 class Html : Tag {
@@ -38,28 +41,18 @@ class Body : Tag {
     fun p(init: Paragraph.() -> Unit): Tag = Paragraph().apply { init() }.also { children.add(it) }
 }
 
-class Title : TagWithContent {
+class Title : TagWithContent() {
     override val name: String
         get() = "title"
     override val children: MutableList<Tag>
         get() = mutableListOf()
-    override var content: String? = null
-
-    operator fun String.unaryMinus() {
-        content = this
-    }
 }
 
-class Paragraph : TagWithContent {
+class Paragraph : TagWithContent() {
     override val name: String
         get() = "p"
     override val children: MutableList<Tag>
         get() = mutableListOf()
-    override var content: String? = null
-
-    operator fun String.unaryMinus() {
-        content = this
-    }
 }
 
 fun html(init: Html.() -> Unit): Tag = Html().apply { init() }
