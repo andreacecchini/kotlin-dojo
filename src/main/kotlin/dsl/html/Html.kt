@@ -11,19 +11,9 @@ class Html : Tag {
         get() = "html"
     override val children: MutableList<Tag> = mutableListOf()
 
-    fun head(init: Head.() -> Unit): Tag {
-        val head = Head()
-        head.init()
-        children.add(head)
-        return head
-    }
+    fun head(init: Head.() -> Unit): Tag = Head().apply { init() }.also { children.add(it) }
 
-    fun body(init: Body.() -> Unit): Tag {
-        val body = Body()
-        body.init()
-        children.add(body)
-        return body
-    }
+    fun body(init: Body.() -> Unit): Tag = Body().apply { init() }.also { children.add(it) }
 }
 
 class Head : Tag {
@@ -38,11 +28,7 @@ class Body : Tag {
     override val children: MutableList<Tag> = mutableListOf()
 }
 
-fun html(init: Html.() -> Unit): Tag {
-    val html = Html()
-    html.init()
-    return html
-}
+fun html(init: Html.() -> Unit): Tag = Html().apply { init() }
 
 fun main() {
     html {
