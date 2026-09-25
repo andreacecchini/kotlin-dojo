@@ -11,7 +11,16 @@ interface Tag {
     fun render(): String = "<$name>${renderInner()}</$name>"
 }
 
-abstract class TagWithContent : Tag {
+abstract class AbstractTag : Tag {
+    override val children: MutableList<Tag> = mutableListOf()
+    protected fun <T : Tag> initTag(tag: T, init: T.() -> Unit): T {
+        tag.init()
+        children.add(tag)
+        return tag
+    }
+}
+
+abstract class TagWithContent : AbstractTag() {
     var content: String? = null
     override fun renderInner(): String = (content ?: "") + super.renderInner()
     operator fun String.unaryMinus() {
@@ -19,42 +28,33 @@ abstract class TagWithContent : Tag {
     }
 }
 
-class Html : Tag {
+class Html : AbstractTag() {
     override val name: String
         get() = "html"
-    override val children: MutableList<Tag> = mutableListOf()
-
-    fun head(init: Head.() -> Unit): Tag = Head().apply { init() }.also { children.add(it) }
-
-    fun body(init: Body.() -> Unit): Tag = Body().apply { init() }.also { children.add(it) }
+    fun head(init: Head.() -> Unit): Tag = initTag(Head(), init)
+    fun body(init: Body.() -> Unit): Tag = initTag(Body(), init)
 }
 
-class Head : Tag {
+class Head : AbstractTag() {
     override val name: String
         get() = "head"
-    override val children: MutableList<Tag> = mutableListOf()
-
-    fun title(init: Title.() -> Unit): Tag = Title().apply { init() }.also { children.add(it) }
+    fun title(init: Title.() -> Unit): Tag = initTag(Title(), init)
 }
 
-class Body : Tag {
+class Body : AbstractTag() {
     override val name: String
         get() = "body"
-    override val children: MutableList<Tag> = mutableListOf()
-
-    fun p(init: Paragraph.() -> Unit): Tag = Paragraph().apply { init() }.also { children.add(it) }
+    fun p(init: Paragraph.() -> Unit): Tag = initTag(Paragraph(), init)
 }
 
 class Title : TagWithContent() {
     override val name: String
         get() = "title"
-    override val children: MutableList<Tag> = mutableListOf()
 }
 
 class Paragraph : TagWithContent() {
     override val name: String
         get() = "p"
-    override val children: MutableList<Tag> = mutableListOf()
 }
 
 fun html(init: Html.() -> Unit): Tag = Html().apply { init() }
