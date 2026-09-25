@@ -7,17 +7,14 @@ annotation class HtmlMarker
 interface Tag {
     val name: String
     val children: MutableList<Tag>
-    fun renderInner(): String = children.joinToString("") { it.render() }
-    fun render(): String = "<$name>${renderInner()}</$name>"
+    fun render(): String
 }
 
 abstract class AbstractTag : Tag {
     override val children: MutableList<Tag> = mutableListOf()
-    protected fun <T : Tag> initTag(tag: T, init: T.() -> Unit): T {
-        tag.init()
-        children.add(tag)
-        return tag
-    }
+    override fun render(): String = "<$name>${renderInner()}</$name>"
+    protected fun <T : Tag> initTag(tag: T, init: T.() -> Unit): T = tag.apply { init() }.also { children.add(it) }
+    protected open fun renderInner(): String = children.joinToString("") { it.render() }
 }
 
 abstract class TagWithContent : AbstractTag() {
