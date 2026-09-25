@@ -1,5 +1,9 @@
 package dsl.html
 
+@DslMarker
+annotation class HtmlMarker
+
+@HtmlMarker
 interface Tag {
     val name: String
     val children: MutableList<Tag>
@@ -44,15 +48,13 @@ class Body : Tag {
 class Title : TagWithContent() {
     override val name: String
         get() = "title"
-    override val children: MutableList<Tag>
-        get() = mutableListOf()
+    override val children: MutableList<Tag> = mutableListOf()
 }
 
 class Paragraph : TagWithContent() {
     override val name: String
         get() = "p"
-    override val children: MutableList<Tag>
-        get() = mutableListOf()
+    override val children: MutableList<Tag> = mutableListOf()
 }
 
 fun html(init: Html.() -> Unit): Tag = Html().apply { init() }
